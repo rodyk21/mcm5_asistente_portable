@@ -1,0 +1,399 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MCM5 Prototype Demo</title>
+  <style>
+    :root {
+      --bg: #efe8da;
+      --card: rgba(255, 252, 245, 0.96);
+      --line: #d6c7af;
+      --ink: #1f2b26;
+      --muted: #5f6d66;
+      --accent: #0c6a57;
+      --accent-2: #bf642c;
+      --soft: #f8f2e6;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: "Segoe UI", Tahoma, sans-serif;
+      background:
+        radial-gradient(circle at top right, rgba(12,106,87,0.12), transparent 24%),
+        radial-gradient(circle at bottom left, rgba(191,100,44,0.12), transparent 30%),
+        linear-gradient(180deg, #f7f2e8, var(--bg));
+    }
+    .wrap { max-width: 1180px; margin: 0 auto; padding: 24px; }
+    .hero, .card {
+      border: 1px solid var(--line);
+      background: var(--card);
+      border-radius: 24px;
+      box-shadow: 0 12px 30px rgba(58, 46, 24, 0.06);
+    }
+    .hero { padding: 28px; }
+    h1, h2 { margin: 0 0 10px; }
+    p { margin: 0; color: var(--muted); line-height: 1.55; }
+    .badge {
+      display: inline-block;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(12,106,87,0.10);
+      color: var(--accent);
+      font-weight: 700;
+      margin-bottom: 14px;
+    }
+    .hero-grid, .grid, .stats {
+      display: grid;
+      gap: 14px;
+    }
+    .hero-grid { grid-template-columns: 1.4fr 1fr; margin-top: 18px; }
+    .stats { grid-template-columns: repeat(4, 1fr); }
+    .stat {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 14px;
+      background: #fff9ef;
+    }
+    .stat strong { display: block; font-size: 1.45rem; margin-bottom: 4px; }
+    .grid { grid-template-columns: 1.4fr 1fr; margin-top: 18px; }
+    .stack { display: grid; gap: 18px; }
+    .card { padding: 18px; }
+    .eyebrow {
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      font-size: .82rem;
+      color: var(--accent-2);
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    textarea, input, select, button {
+      width: 100%;
+      margin-top: 10px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      padding: 12px 14px;
+      font: inherit;
+      background: white;
+    }
+    textarea { min-height: 120px; resize: vertical; }
+    button {
+      border: 0;
+      cursor: pointer;
+      font-weight: 700;
+      background: var(--accent);
+      color: white;
+    }
+    button.secondary { background: var(--accent-2); }
+    .inline {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .inline3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .result, .list-item {
+      margin-top: 12px;
+      border-radius: 16px;
+      border: 1px dashed var(--line);
+      background: var(--soft);
+      padding: 14px;
+      white-space: pre-wrap;
+    }
+    .list { display: grid; gap: 10px; margin-top: 12px; }
+    .list-item strong { display: block; margin-bottom: 6px; }
+    .pill {
+      display: inline-block;
+      padding: 8px 12px;
+      border-radius: 999px;
+      margin-right: 8px;
+      margin-top: 10px;
+      background: rgba(12,106,87,0.10);
+      color: var(--accent);
+      font-weight: 700;
+      font-size: .9rem;
+    }
+    @media (max-width: 900px) {
+      .hero-grid, .grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 720px) {
+      .stats, .inline, .inline3 { grid-template-columns: 1fr; }
+      .wrap { padding: 16px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="hero">
+      <div class="badge">Demo visual portable · sin instalacion</div>
+      <h1>MCM5 AI Maintenance Assistant</h1>
+      <p>Prototipo de la aplicacion web para mostrar el concepto: consulta tecnica, busqueda de parametros, biblioteca tecnica y aprendizaje manual de la maquina.</p>
+      <div>
+        <span class="pill">Chat tecnico</span>
+        <span class="pill">MID-RANGE / cotas</span>
+        <span class="pill">CBA y manuales</span>
+        <span class="pill">Conocimiento manual</span>
+      </div>
+      <div class="hero-grid">
+        <div class="stats">
+          <div class="stat"><strong>94</strong><span>DDS detectados</span></div>
+          <div class="stat"><strong>587</strong><span>RDI / CND</span></div>
+          <div class="stat"><strong>109</strong><span>PM Cards</span></div>
+          <div class="stat"><strong>238</strong><span>BMS / MID-RANGE</span></div>
+        </div>
+        <div class="stat">
+          <strong>Objetivo</strong>
+          <span>Que el sistema responda como el tecnico que mas sabe de MCM5 porque acumula todos los focos, parametros, CBA y soluciones.</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="grid">
+      <div class="stack">
+        <article class="card">
+          <div class="eyebrow">Asistente tecnico</div>
+          <h2>Consulta de fallos</h2>
+          <p>Haz preguntas como si hablaras con un tecnico experto.</p>
+          <textarea id="consulta" placeholder="Ejemplo: me falla la optima y no coge bien la bolsa"></textarea>
+          <div class="inline">
+            <button id="consultarBtn">Consultar</button>
+            <button id="ejemploBtn" class="secondary">Cargar ejemplo</button>
+          </div>
+          <div id="consultaResult" class="result">La respuesta aparecera aqui.</div>
+        </article>
+
+        <article class="card">
+          <div class="eyebrow">Busqueda de parametros</div>
+          <h2>Cotas, cambios y MID-RANGE</h2>
+          <div class="inline">
+            <input id="paramQuery" placeholder="Ejemplo: 520-109 o optima">
+            <button id="paramBtn">Buscar</button>
+          </div>
+          <div id="paramResult" class="list"></div>
+        </article>
+
+        <article class="card">
+          <div class="eyebrow">Aprendizaje manual</div>
+          <h2>Registrar nuevo foco o conocimiento</h2>
+          <div class="inline3">
+            <input id="kmArea" placeholder="Area">
+            <input id="kmEstacion" placeholder="Estacion">
+            <input id="kmComponente" placeholder="Componente">
+          </div>
+          <input id="kmTitulo" placeholder="Titulo corto">
+          <textarea id="kmDescripcion" placeholder="Que ha pasado"></textarea>
+          <textarea id="kmSolucion" placeholder="Como se ha solucionado"></textarea>
+          <button id="kmBtn">Guardar en demo</button>
+          <div id="kmResult" class="result">El conocimiento guardado en la demo se conserva en este navegador.</div>
+        </article>
+      </div>
+
+      <div class="stack">
+        <article class="card">
+          <div class="eyebrow">Biblioteca tecnica</div>
+          <h2>CBA, manuales y planos</h2>
+          <div class="inline">
+            <input id="docQuery" placeholder="Ejemplo: nordson, sonotrodo, cva">
+            <button id="docBtn">Buscar</button>
+          </div>
+          <div id="docResult" class="list"></div>
+        </article>
+
+        <article class="card">
+          <div class="eyebrow">Lo que demostramos hoy</div>
+          <h2>Que ya existe una direccion clara</h2>
+          <div class="list">
+            <div class="list-item"><strong>1. Consulta inteligente</strong> El tecnico pregunta en lenguaje natural y recibe un diagnostico basado en historico real.</div>
+            <div class="list-item"><strong>2. Parametros exactos</strong> Se puede preguntar por una variable y obtener target, tolerancias y cambios.</div>
+            <div class="list-item"><strong>3. Biblioteca viva</strong> CBA, manuales, planos y documentacion de equipos como Nordson.</div>
+            <div class="list-item"><strong>4. Aprendizaje continuo</strong> Cada foco nuevo y cada solucion nueva amplian el conocimiento del sistema.</div>
+          </div>
+        </article>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const mockAnswers = [
+      {
+        match: ["optima", "bolsa"],
+        text:
+`Ha pasado antes: si, aparece repetido en historico relacionado con OPTIMA y packaging.
+
+Accion inmediata recomendada:
+- revisar cogida de bolsa
+- revisar vacio y presiones asociadas
+- comprobar desgaste o desajuste en la zona de transferencia
+
+Causa raiz mas probable:
+- desajuste de la estacion
+- perdida de vacio
+- problemas QA en fondo de bolsa
+
+Parametros MID-RANGE a revisar:
+- 520-109
+- 520-038
+- 520-032
+
+Patron repetitivo:
+Se observan varios ajustes documentados en cambios MID-RANGE de OPTIMA por averias recurrentes y problemas de fondo de bolsa.`
+      },
+      {
+        match: ["ipt", "vaso"],
+        text:
+`Ha pasado antes: si, hay PM Cards sobre vasos IPT.
+
+Accion inmediata recomendada:
+- revisar vaso afectado
+- comprobar tirantes, guias y rodamiento lineal
+- revisar interaccion con el bombo del corte final
+
+Causa raiz mas probable:
+- fatiga mecanica o apriete deficiente
+- impacto o descolgado del reenvio
+
+Patron repetitivo:
+Hay historico de averias graves en vasos de IPT documentadas en PM Card.`
+      },
+      {
+        match: ["nordson"],
+        text:
+`Busqueda orientada a equipo externo:
+- localizar manual del aplicador Nordson
+- revisar modelo exacto del aplicador
+- asociar labios, boquillas, presiones y planos de repuesto
+
+En la version final, esta consulta buscara primero en biblioteca tecnica local y luego en documentacion asociada al equipo.`
+      }
+    ];
+
+    const mockParams = {
+      "520-109": [
+        { title: "520-109 / OPTIMA / Lindor Pants M P30", detail: "Target: 325 | Tolerancias: - / - | Tipo: variable_control" },
+        { title: "Ultimo cambio conocido", detail: "2026-02-27 / 520-109 / actualizado en revision de OPTIMA" }
+      ],
+      "optima": [
+        { title: "520-038 / Altura placa superior Bar Conveyor", detail: "Cambio registrado por problemas QA de fondo bolsa" },
+        { title: "520-032 / Altura brazo superior LO CMLI", detail: "Cambio tras ajustes de F&F en OPTIMA" },
+        { title: "520-109 / Presiones varias de aire", detail: "Variable de control asociada a OPTIMA" }
+      ],
+      "corte final": [
+        { title: "PM CARD ROTURA VASO IPT", detail: "Referencia al impacto contra bombo del corte final" },
+        { title: "CND corte final desfasado", detail: "Historico relacionado en RDI CAPA" }
+      ]
+    };
+
+    const mockDocs = [
+      { name: "CBA paralelismo sonotrodo.pdf", category: "cba", path: "Biblioteca/CBA/CBA paralelismo sonotrodo.pdf" },
+      { name: "Manual aplicador Nordson ProBlue.pdf", category: "manual", path: "Biblioteca/Nordson/Manual aplicador Nordson ProBlue.pdf" },
+      { name: "Plano labio Nordson A7.dwg", category: "plano", path: "Biblioteca/Nordson/Plano labio Nordson A7.dwg" },
+      { name: "Guia ajuste OPTIMA packaging.pdf", category: "guia", path: "Biblioteca/OPTIMA/Guia ajuste OPTIMA packaging.pdf" }
+    ];
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;");
+    }
+
+    function renderList(container, items, emptyMessage) {
+      if (!items.length) {
+        container.innerHTML = `<div class="list-item">${emptyMessage}</div>`;
+        return;
+      }
+      container.innerHTML = items.map(item => `
+        <div class="list-item">
+          <strong>${escapeHtml(item.title || item.name)}</strong>
+          <div>${escapeHtml(item.detail || "")}</div>
+          ${item.path ? `<div>${escapeHtml(item.path)}</div>` : ""}
+        </div>
+      `).join("");
+    }
+
+    function findAnswer(query) {
+      const normalized = query.toLowerCase();
+      for (const item of mockAnswers) {
+        if (item.match.every(token => normalized.includes(token))) return item.text;
+      }
+      return `Ha pasado antes: posiblemente si, pero esta demo visual no esta conectada a la base real.
+
+En la version funcional, esta respuesta se construira con DDS + RDI + PM Card + MID-RANGE + conocimiento manual.`;
+    }
+
+    function findParams(query) {
+      const normalized = query.toLowerCase();
+      for (const [key, items] of Object.entries(mockParams)) {
+        if (normalized.includes(key)) return items;
+      }
+      return [];
+    }
+
+    function findDocs(query) {
+      const normalized = query.toLowerCase();
+      return mockDocs.filter(item =>
+        item.name.toLowerCase().includes(normalized) ||
+        item.path.toLowerCase().includes(normalized) ||
+        item.category.toLowerCase().includes(normalized)
+      );
+    }
+
+    function loadKnowledge() {
+      return JSON.parse(localStorage.getItem("mcm5_demo_knowledge") || "[]");
+    }
+
+    function saveKnowledge(items) {
+      localStorage.setItem("mcm5_demo_knowledge", JSON.stringify(items));
+    }
+
+    document.getElementById("ejemploBtn").addEventListener("click", () => {
+      document.getElementById("consulta").value = "Me falla la optima y no coge bien la bolsa";
+    });
+
+    document.getElementById("consultarBtn").addEventListener("click", () => {
+      const query = document.getElementById("consulta").value.trim();
+      document.getElementById("consultaResult").textContent = findAnswer(query);
+    });
+
+    document.getElementById("paramBtn").addEventListener("click", () => {
+      const query = document.getElementById("paramQuery").value.trim();
+      renderList(
+        document.getElementById("paramResult"),
+        findParams(query),
+        "No hay coincidencias en la demo para esa busqueda."
+      );
+    });
+
+    document.getElementById("docBtn").addEventListener("click", () => {
+      const query = document.getElementById("docQuery").value.trim();
+      renderList(
+        document.getElementById("docResult"),
+        findDocs(query),
+        "No hay documentos de ejemplo que coincidan con esa busqueda."
+      );
+    });
+
+    document.getElementById("kmBtn").addEventListener("click", () => {
+      const entry = {
+        title: document.getElementById("kmTitulo").value.trim() || "Sin titulo",
+        detail: [
+          document.getElementById("kmArea").value.trim(),
+          document.getElementById("kmEstacion").value.trim(),
+          document.getElementById("kmComponente").value.trim(),
+          document.getElementById("kmDescripcion").value.trim(),
+          document.getElementById("kmSolucion").value.trim()
+        ].filter(Boolean).join(" | ")
+      };
+      const items = loadKnowledge();
+      items.unshift(entry);
+      saveKnowledge(items);
+      document.getElementById("kmResult").textContent = "Guardado en demo local. Entradas guardadas: " + items.length;
+    });
+  </script>
+</body>
+</html>

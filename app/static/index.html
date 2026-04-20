@@ -1,0 +1,1419 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MCM5 AI Maintenance Assistant</title>
+  <style>
+    :root {
+      --bg: #efe8da;
+      --card: rgba(255, 252, 245, 0.94);
+      --line: #d6c7af;
+      --ink: #1f2b26;
+      --muted: #5f6d66;
+      --accent: #0c6a57;
+      --accent-2: #bf642c;
+      --accent-3: #c9a44d;
+      --soft: #f8f2e6;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: "Segoe UI", Tahoma, sans-serif;
+      background:
+        radial-gradient(circle at top right, rgba(12,106,87,0.12), transparent 24%),
+        radial-gradient(circle at bottom left, rgba(191,100,44,0.12), transparent 30%),
+        linear-gradient(180deg, #f7f2e8, var(--bg));
+    }
+    .wrap {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+    .hero {
+      border: 1px solid var(--line);
+      background:
+        linear-gradient(135deg, rgba(255,252,245,0.98), rgba(244,233,214,0.92));
+      border-radius: 28px;
+      padding: 28px;
+      box-shadow: 0 18px 44px rgba(58, 46, 24, 0.08);
+    }
+    .hero-top {
+      display: flex;
+      align-items: start;
+      justify-content: space-between;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(12,106,87,0.10);
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+    h1, h2, h3 {
+      margin: 0 0 10px;
+      line-height: 1.1;
+    }
+    h1 {
+      font-size: clamp(2rem, 4.5vw, 3.6rem);
+      max-width: 720px;
+    }
+    p {
+      margin: 0;
+      line-height: 1.55;
+      color: var(--muted);
+    }
+    .hero-copy {
+      max-width: 780px;
+      margin-top: 14px;
+    }
+    .quick-stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(120px, 1fr));
+      gap: 12px;
+      margin-top: 24px;
+    }
+    .quick-stat {
+      padding: 16px;
+      background: rgba(255, 250, 240, 0.9);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+    }
+    .quick-stat strong {
+      display: block;
+      font-size: 1.5rem;
+      margin-bottom: 6px;
+    }
+    .layout {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: 18px;
+      margin-top: 18px;
+    }
+    .stack {
+      display: grid;
+      gap: 18px;
+    }
+    .card {
+      border: 1px solid var(--line);
+      background: var(--card);
+      border-radius: 24px;
+      padding: 20px;
+      box-shadow: 0 12px 30px rgba(58, 46, 24, 0.06);
+      backdrop-filter: blur(10px);
+    }
+    .card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+    .eyebrow {
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--accent-2);
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .hint {
+      font-size: 0.93rem;
+      color: var(--muted);
+    }
+    textarea, input, select, button {
+      width: 100%;
+      margin-top: 10px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      padding: 12px 14px;
+      font: inherit;
+      color: var(--ink);
+      background: white;
+    }
+    textarea {
+      min-height: 140px;
+      resize: vertical;
+    }
+    .compact textarea {
+      min-height: 92px;
+    }
+    .inline {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .inline-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+    button {
+      border: 0;
+      cursor: pointer;
+      font-weight: 700;
+      background: var(--accent);
+      color: white;
+      transition: transform .15s ease, opacity .15s ease;
+    }
+    button:hover { transform: translateY(-1px); }
+    button.secondary { background: var(--accent-2); }
+    button.ghost {
+      background: #fff9ef;
+      color: var(--ink);
+      border: 1px solid var(--line);
+    }
+    button:disabled {
+      opacity: .72;
+      cursor: wait;
+      transform: none;
+    }
+    .result {
+      margin-top: 12px;
+      border-radius: 18px;
+      border: 1px dashed var(--line);
+      background: var(--soft);
+      padding: 14px;
+      white-space: pre-wrap;
+      min-height: 120px;
+    }
+    .list {
+      margin-top: 12px;
+      display: grid;
+      gap: 10px;
+    }
+    .list-item {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 12px 14px;
+      background: rgba(255,255,255,0.85);
+    }
+    .list-item strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .pill {
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      background: rgba(201,164,77,0.12);
+      color: #7a5c0f;
+      border: 1px solid rgba(201,164,77,0.25);
+    }
+    .footer-note {
+      margin-top: 18px;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .zone-row {
+      margin-top: 14px;
+    }
+    .zone-chip {
+      width: auto;
+      margin-top: 0;
+      border: 1px solid var(--line);
+      background: rgba(255, 249, 239, 0.94);
+      color: var(--ink);
+      padding: 9px 12px;
+      border-radius: 999px;
+      font-size: 0.9rem;
+      font-weight: 700;
+    }
+    .zone-chip.active {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+    }
+    .shortcut-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .shortcut-btn {
+      width: auto;
+      margin-top: 0;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.9);
+      color: var(--ink);
+      padding: 9px 12px;
+      border-radius: 999px;
+      font-size: 0.88rem;
+      font-weight: 700;
+    }
+    .meta-block {
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px dashed var(--line);
+    }
+    .meta-block h3 {
+      font-size: 0.95rem;
+      margin-bottom: 8px;
+    }
+    .meta-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .meta-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: rgba(12,106,87,0.10);
+      color: var(--accent);
+      border: 1px solid rgba(12,106,87,0.18);
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+    .result-body {
+      line-height: 1.6;
+      white-space: normal;
+    }
+    .result-body p {
+      color: var(--ink);
+      margin: 0;
+    }
+    .actions-inline {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .actions-inline button {
+      width: auto;
+      margin-top: 0;
+    }
+    .toggle-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 12px;
+      align-items: center;
+    }
+    .toggle-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.86);
+      color: var(--ink);
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+    .toggle-pill input {
+      width: auto;
+      margin: 0;
+      padding: 0;
+    }
+    .proficy-stats {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .proficy-stat {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 12px;
+      background: rgba(255,255,255,0.86);
+    }
+    .proficy-stat strong {
+      display: block;
+      font-size: 1.2rem;
+      margin-bottom: 4px;
+    }
+    .mini-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .mini-actions button {
+      width: auto;
+      margin-top: 0;
+      padding: 10px 12px;
+      font-size: 0.88rem;
+    }
+    @media (max-width: 980px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+    }
+    @media (max-width: 760px) {
+      .inline, .inline-3, .quick-stats, .proficy-stats {
+        grid-template-columns: 1fr;
+      }
+      .wrap {
+        padding: 16px;
+      }
+      .hero, .card {
+        border-radius: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="hero">
+      <div class="hero-top">
+        <div>
+          <span class="badge">MCM5 · Prototipo web para planta</span>
+          <div class="hero-copy">
+            <h1>Asistente tecnico para fallos, parametros, CBA y conocimiento real de la maquina</h1>
+            <p>
+              Consulta focos historicos, busca cotas MID-RANGE, localiza documentacion tecnica y registra
+              nuevo conocimiento manual para que el sistema sepa cada vez mas de MCM5.
+            </p>
+          </div>
+        </div>
+        <div class="toolbar">
+          <button id="statsBtn" class="ghost">Actualizar metricas</button>
+          <button id="ingestBtn" class="secondary">Procesar carpetas</button>
+        </div>
+      </div>
+
+      <div class="quick-stats">
+        <div class="quick-stat"><strong id="sParos">-</strong><span>Paros DDS</span></div>
+        <div class="quick-stat"><strong id="sRdis">-</strong><span>RDI</span></div>
+        <div class="quick-stat"><strong id="sPm">-</strong><span>PM Cards</span></div>
+        <div class="quick-stat"><strong id="sMie">-</strong><span>Parametros MID-RANGE</span></div>
+      </div>
+      <div class="pill-row">
+        <span class="pill">Consulta en lenguaje natural</span>
+        <span class="pill">Busqueda de parametros</span>
+        <span class="pill">Biblioteca tecnica</span>
+        <span class="pill">Aprendizaje manual</span>
+      </div>
+    </section>
+
+    <section class="layout">
+      <div class="stack">
+        <article class="card">
+          <div class="eyebrow">Asistente tecnico</div>
+          <div class="card-head">
+            <div>
+              <h2>Consulta a la IA</h2>
+              <p class="hint">Ejemplo: "me falla la optima y no coge bien la bolsa" o "ultimo cambio de la 520-109".</p>
+            </div>
+          </div>
+          <div class="inline">
+            <select id="provider">
+              <option value="auto">Auto</option>
+              <option value="anthropic">Anthropic / Claude</option>
+              <option value="openai">OpenAI / ChatGPT</option>
+              <option value="google">Google / Gemini</option>
+              <option value="xai">xAI / Grok</option>
+            </select>
+            <input value="Proveedor de IA para la consulta actual" disabled>
+          </div>
+          <div class="pill-row zone-row" id="zoneRow">
+            <button class="zone-chip active" data-zone="">Todas</button>
+            <button class="zone-chip" data-zone="optima">Optima</button>
+            <button class="zone-chip" data-zone="cuff">Cuff</button>
+            <button class="zone-chip" data-zone="adl">ADL</button>
+            <button class="zone-chip" data-zone="leg die">Leg Die</button>
+            <button class="zone-chip" data-zone="flared">Flared</button>
+            <button class="zone-chip" data-zone="outer">Outer</button>
+            <button class="zone-chip" data-zone="ipt">IPT</button>
+            <button class="zone-chip" data-zone="eoc">EOC</button>
+          </div>
+          <textarea id="consulta" placeholder="Describe el fallo, la estacion o la pregunta tecnica"></textarea>
+          <div class="toolbar">
+            <button id="consultarBtn">Consultar</button>
+            <button id="usarEjemploBtn" class="ghost">Cargar ejemplo</button>
+          </div>
+          <div class="toggle-row">
+            <label class="toggle-pill">
+              <input id="consultaUseProficy" type="checkbox">
+              Usar contexto Proficy cargado
+            </label>
+          </div>
+          <div class="shortcut-grid" id="shortcutGrid">
+            <button class="shortcut-btn" data-question="Que componente ha dado mas paros este mes?">Top fallos del mes</button>
+            <button class="shortcut-btn" data-question="Muestrame los fallos mas repetidos de la Optima">Fallos de Optima</button>
+            <button class="shortcut-btn" data-question="Que fallos no tienen causa raiz clara?">Sin causa raiz</button>
+            <button class="shortcut-btn" data-question="Que parametro MID-RANGE debo revisar en la zona de cuff?">Parametros a revisar</button>
+            <button class="shortcut-btn" data-question="Que soluciones se repiten mas en los ultimos casos?">Soluciones repetidas</button>
+            <button class="shortcut-btn" data-question="Que RDIs hay relacionados con contaminacion o cola?">RDIs por cola</button>
+          </div>
+          <div id="consultaResult" class="result">Todavia no hay respuesta.</div>
+        </article>
+
+        <article class="card compact">
+          <div class="eyebrow">Parametros y cotas</div>
+          <div class="card-head">
+            <div>
+              <h2>Buscar variable o estacion</h2>
+              <p class="hint">Busca por codigo, estacion, formato o texto libre. Ejemplo: 520-109, optima, corte final.</p>
+            </div>
+          </div>
+          <div class="inline">
+            <input id="paramQuery" placeholder="Codigo o texto libre">
+            <button id="paramBtn">Buscar parametro</button>
+          </div>
+          <div id="paramResult" class="list"></div>
+        </article>
+
+        <article class="card compact">
+          <div class="eyebrow">Aprendizaje de planta</div>
+          <div class="card-head">
+            <div>
+              <h2>Registrar conocimiento manual</h2>
+              <p class="hint">Guarda focos, causas raiz, soluciones y notas tecnicas para que la app aprenda de la maquina.</p>
+            </div>
+          </div>
+          <div class="inline-3">
+            <input id="kmArea" placeholder="Area">
+            <input id="kmEstacion" placeholder="Estacion">
+            <input id="kmComponente" placeholder="Componente">
+          </div>
+          <input id="kmTitulo" placeholder="Titulo corto del foco o conocimiento">
+          <textarea id="kmDescripcion" placeholder="Que ha pasado, como ha pasado, sintomas o contexto"></textarea>
+          <textarea id="kmSolucion" placeholder="Como se soluciono o que recomiendas revisar"></textarea>
+          <div class="inline">
+            <input id="kmCausa" placeholder="Causa raiz">
+            <input id="kmTags" placeholder="Tags, ejemplo: optima, bolsa, qa">
+          </div>
+          <button id="kmBtn">Guardar conocimiento</button>
+          <div class="actions-inline">
+            <button id="kmExportBtn" class="ghost">Exportar conocimiento</button>
+            <button id="kmImportBtn" class="ghost">Importar conocimiento</button>
+          </div>
+          <div id="kmResult" class="result">Aun no se ha guardado conocimiento manual.</div>
+        </article>
+      </div>
+
+      <div class="stack">
+        <article class="card compact">
+          <div class="eyebrow">Biblioteca tecnica</div>
+          <div class="card-head">
+            <div>
+              <h2>Buscar CBA, manuales y planos</h2>
+              <p class="hint">Busca por nombre de equipo, Nordson, sonotrodo, CBA, plano o palabra clave.</p>
+            </div>
+          </div>
+          <div class="inline">
+            <input id="docQuery" placeholder="Ejemplo: nordson, cva, sonotrodo, optima">
+            <button id="docBtn">Buscar documento</button>
+          </div>
+          <div id="docResult" class="list"></div>
+        </article>
+
+        <article class="card compact">
+          <div class="eyebrow">Carga de datos</div>
+          <div class="card-head">
+            <div>
+              <h2>Subida manual de archivo</h2>
+              <p class="hint">Procesa un DDS, RDI, PM Card o MID-RANGE concreto sin esperar a la ingesta general.</p>
+            </div>
+          </div>
+          <select id="tipo">
+            <option value="DDS">DDS</option>
+            <option value="RDI">RDI</option>
+            <option value="PM_CARD">PM_CARD</option>
+            <option value="MIE_RANGE">MIE_RANGE</option>
+          </select>
+          <input id="archivo" type="file" accept=".xlsx,.xlsm">
+          <button id="uploadBtn">Subir y procesar</button>
+          <div id="uploadResult" class="result">Ningun archivo procesado todavia.</div>
+        </article>
+
+        <article class="card compact">
+          <div class="eyebrow">Proficy</div>
+          <div class="card-head">
+            <div>
+              <h2>Importar informe Proficy</h2>
+              <p class="hint">Carga LineSummary o DPR para analizar paros, turnos, comentarios y tiempo perdido. Mejor en .xlsx o .csv para uso offline.</p>
+            </div>
+          </div>
+          <input id="proficyFile" type="file" accept=".xls,.xlsx,.csv,.txt">
+          <div class="actions-inline">
+            <button id="proficyImportBtn">Importar Proficy</button>
+            <button id="proficyExportBtn" class="ghost">Exportar backup</button>
+            <button id="proficyClearBtn" class="ghost">Borrar Proficy</button>
+          </div>
+          <div class="proficy-stats">
+            <div class="proficy-stat"><strong id="pParos">0</strong><span>Paros</span></div>
+            <div class="proficy-stat"><strong id="pSinComentario">0</strong><span>Sin comentario</span></div>
+            <div class="proficy-stat"><strong id="pTiempo">0 min</strong><span>Tiempo perdido</span></div>
+          </div>
+          <div class="mini-actions">
+            <button id="proficyMayorBtn" class="ghost">Mayor perdida</button>
+            <button id="proficyTurnoBtn" class="ghost">Por turno</button>
+            <button id="proficySinComBtn" class="ghost">Sin comentario</button>
+          </div>
+          <div id="proficyResult" class="result">Todavia no se ha cargado ningun informe Proficy.</div>
+        </article>
+
+        <article class="card compact">
+          <div class="eyebrow">Indicadores</div>
+          <div class="card-head">
+            <div>
+              <h2>Alertas repetitivas</h2>
+              <p class="hint">Componentes con recurrencia en DDS para usar en la demo y mostrar patrones.</p>
+            </div>
+            <button id="alertasBtn" class="ghost">Cargar alertas</button>
+          </div>
+          <div id="alertasResult" class="list"></div>
+        </article>
+
+        <article class="card compact">
+          <div class="eyebrow">Estado de la base</div>
+          <div id="ingestResult" class="result">Aun no se ha ejecutado ninguna ingesta en esta sesion.</div>
+          <p class="footer-note">
+            Este prototipo esta pensado para demostrar la idea: historico real + parametros + biblioteca + conocimiento manual.
+          </p>
+        </article>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const STORAGE_KEYS = {
+      provider: "mcm5_ui_provider",
+      zone: "mcm5_ui_zone"
+    };
+    const PROFICY_STORE_KEY = "mcm5_proficy_store_v1";
+
+    let currentZone = "";
+    let proficyStore = loadProficyStore();
+
+    async function requestJson(url, options = {}) {
+      const response = await fetch(url, options);
+      if (!response.ok) {
+        const text = await response.text();
+        throw new Error(text || "Error inesperado");
+      }
+      return response.json();
+    }
+
+    function setBusy(button, busy, busyText) {
+      if (!button.dataset.originalText) button.dataset.originalText = button.textContent;
+      button.disabled = busy;
+      button.textContent = busy ? busyText : button.dataset.originalText;
+    }
+
+    function renderList(container, items, renderer, emptyMessage) {
+      if (!items || !items.length) {
+        container.innerHTML = `<div class="list-item">${emptyMessage}</div>`;
+        return;
+      }
+      container.innerHTML = items.map(renderer).join("");
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;");
+    }
+
+    function nl2br(value) {
+      return escapeHtml(value).replaceAll("\n", "<br>");
+    }
+
+    function getZoneLabel(zone) {
+      return zone ? zone.toUpperCase() : "TODAS";
+    }
+
+    function formatMinutes(total) {
+      const value = Number(total || 0);
+      if (value >= 60) {
+        return `${(value / 60).toFixed(1)} h`;
+      }
+      return `${Math.round(value)} min`;
+    }
+
+    function normalizeText(value) {
+      return String(value || "")
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .trim();
+    }
+
+    function loadProficyStore() {
+      try {
+        const raw = localStorage.getItem(PROFICY_STORE_KEY);
+        const parsed = raw ? JSON.parse(raw) : null;
+        return parsed && typeof parsed === "object"
+          ? {
+              paros: Array.isArray(parsed.paros) ? parsed.paros : [],
+              descartes: Array.isArray(parsed.descartes) ? parsed.descartes : [],
+              dpr: Array.isArray(parsed.dpr) ? parsed.dpr : [],
+              otros: Array.isArray(parsed.otros) ? parsed.otros : []
+            }
+          : { paros: [], descartes: [], dpr: [], otros: [] };
+      } catch (_) {
+        return { paros: [], descartes: [], dpr: [], otros: [] };
+      }
+    }
+
+    function saveProficyStore() {
+      localStorage.setItem(PROFICY_STORE_KEY, JSON.stringify(proficyStore));
+    }
+
+    function hasProficyData() {
+      return Object.values(proficyStore).some(items => items.length > 0);
+    }
+
+    function mapArea(location) {
+      const text = normalizeText(location);
+      if (!text) return "Sin area";
+      if (text.includes("optima")) return "Optima";
+      if (text.includes("cuff")) return "Cuff";
+      if (text.includes("adl")) return "ADL";
+      if (text.includes("leg")) return "Leg Die";
+      if (text.includes("flared")) return "Flared";
+      if (text.includes("outer")) return "Outer";
+      if (text.includes("ipt")) return "IPT";
+      if (text.includes("eoc")) return "EOC";
+      return String(location || "").trim() || "Sin area";
+    }
+
+    function dedupKey(item, type) {
+      if (type === "paros") {
+        return [item.start_time, item.area, item.reason1, item.reason2, item.duracion_min].join("|");
+      }
+      if (type === "dpr") {
+        return `${item.fecha}|${item.producto}|${item.downtime_total}`;
+      }
+      return JSON.stringify(item);
+    }
+
+    function mergeProficyData(type, rows) {
+      if (!proficyStore[type]) proficyStore[type] = [];
+      const existing = new Set(proficyStore[type].map(item => dedupKey(item, type)));
+      const nuevos = rows.filter(item => {
+        const key = dedupKey(item, type);
+        if (existing.has(key)) return false;
+        existing.add(key);
+        return true;
+      });
+      proficyStore[type] = [...proficyStore[type], ...nuevos];
+      saveProficyStore();
+      return nuevos.length;
+    }
+
+    function renderProficySummary(message) {
+      const paros = proficyStore.paros || [];
+      const sinComentario = paros.filter(item => !String(item.comentario || "").trim()).length;
+      const totalMin = paros.reduce((sum, item) => sum + Number(item.duracion_min || 0), 0);
+      document.getElementById("pParos").textContent = paros.length;
+      document.getElementById("pSinComentario").textContent = sinComentario;
+      document.getElementById("pTiempo").textContent = formatMinutes(totalMin);
+
+      const result = document.getElementById("proficyResult");
+      if (message) {
+        result.textContent = message;
+        return;
+      }
+      if (!hasProficyData()) {
+        result.textContent = "Todavia no se ha cargado ningun informe Proficy.";
+        return;
+      }
+
+      const byArea = {};
+      paros.forEach(item => {
+        const key = item.area || "Sin area";
+        if (!byArea[key]) byArea[key] = { min: 0, n: 0 };
+        byArea[key].min += Number(item.duracion_min || 0);
+        byArea[key].n += 1;
+      });
+      const topArea = Object.entries(byArea).sort((a, b) => b[1].min - a[1].min)[0];
+      const lastDpr = (proficyStore.dpr || []).slice(-1)[0];
+      result.innerHTML = `
+        <div class="result-body">
+          <p><strong>Proficy cargado.</strong> ${paros.length} paros, ${formatMinutes(totalMin)} perdidos, ${sinComentario} sin comentario.</p>
+          <p>${topArea ? `Zona con mas perdida: ${escapeHtml(topArea[0])} (${formatMinutes(topArea[1].min)} en ${topArea[1].n} paros).` : "Sin ranking por zonas todavia."}</p>
+          <p>${lastDpr ? `Ultimo DPR: ${escapeHtml(lastDpr.fecha || "?")} · ${formatMinutes(lastDpr.downtime_total || 0)} downtime.` : "Sin DPR cargado."}</p>
+        </div>
+      `;
+    }
+
+    function buildProficyContext() {
+      const paros = proficyStore.paros || [];
+      const dpr = proficyStore.dpr || [];
+      if (!paros.length && !dpr.length) return "";
+
+      const totalMin = paros.reduce((sum, item) => sum + Number(item.duracion_min || 0), 0);
+      const sinComentario = paros.filter(item => !String(item.comentario || "").trim()).length;
+      const byArea = {};
+      paros.forEach(item => {
+        const key = item.area || "Sin area";
+        if (!byArea[key]) byArea[key] = { min: 0, n: 0, sinCom: 0 };
+        byArea[key].min += Number(item.duracion_min || 0);
+        byArea[key].n += 1;
+        if (!String(item.comentario || "").trim()) byArea[key].sinCom += 1;
+      });
+
+      const topAreas = Object.entries(byArea)
+        .sort((a, b) => b[1].min - a[1].min)
+        .slice(0, 5)
+        .map(([area, data]) => `${area}: ${formatMinutes(data.min)} (${data.n} paros${data.sinCom ? ` · ${data.sinCom} sin comentario` : ""})`)
+        .join(" | ");
+
+      const examples = paros
+        .filter(item => !String(item.comentario || "").trim())
+        .slice(0, 5)
+        .map(item => `- ${item.start_time || "?"} · ${item.area || "Sin area"} · ${item.reason1 || item.fault || "Sin motivo"} · ${formatMinutes(item.duracion_min || 0)}`)
+        .join("\n");
+
+      const lastDpr = dpr.slice(-1)[0];
+      return [
+        `DATOS PROFICY: ${paros.length} paros · ${formatMinutes(totalMin)} perdidos · ${sinComentario} sin comentario.`,
+        topAreas ? `TOP ZONAS PROFICY: ${topAreas}` : "",
+        lastDpr ? `ULTIMO DPR: ${lastDpr.fecha || "?"} · downtime ${formatMinutes(lastDpr.downtime_total || 0)} · good product ${lastDpr.good_product_total || 0}.` : "",
+        examples ? `PAROS SIN COMENTARIO:\n${examples}` : ""
+      ].filter(Boolean).join("\n");
+    }
+
+    function calcProficyMayorPerdida() {
+      const paros = proficyStore.paros || [];
+      if (!paros.length) return "No hay paros Proficy cargados.";
+      const byArea = {};
+      paros.forEach(item => {
+        const key = item.area || "Sin area";
+        if (!byArea[key]) byArea[key] = { min: 0, n: 0 };
+        byArea[key].min += Number(item.duracion_min || 0);
+        byArea[key].n += 1;
+      });
+      return Object.entries(byArea)
+        .sort((a, b) => b[1].min - a[1].min)
+        .slice(0, 5)
+        .map(([area, data], index) => `${index + 1}. ${area}: ${formatMinutes(data.min)} en ${data.n} paros`)
+        .join("\n");
+    }
+
+    function calcProficyPorTurno() {
+      const paros = proficyStore.paros || [];
+      if (!paros.length) return "No hay paros Proficy cargados.";
+      const byTurno = { "1": { min: 0, n: 0 }, "2": { min: 0, n: 0 }, "3": { min: 0, n: 0 } };
+      paros.forEach(item => {
+        const turno = String(item.shift || item.turno || "");
+        if (byTurno[turno]) {
+          byTurno[turno].min += Number(item.duracion_min || 0);
+          byTurno[turno].n += 1;
+        }
+      });
+      return [
+        `Turno 1: ${formatMinutes(byTurno["1"].min)} en ${byTurno["1"].n} paros`,
+        `Turno 2: ${formatMinutes(byTurno["2"].min)} en ${byTurno["2"].n} paros`,
+        `Turno 3: ${formatMinutes(byTurno["3"].min)} en ${byTurno["3"].n} paros`
+      ].join("\n");
+    }
+
+    function calcProficySinComentario() {
+      const rows = (proficyStore.paros || []).filter(item => !String(item.comentario || "").trim()).slice(0, 12);
+      if (!rows.length) return "Todos los paros Proficy cargados tienen comentario.";
+      return rows
+        .map(item => `${item.start_time || "?"} · ${item.area || "Sin area"} · ${item.reason1 || item.fault || "Sin motivo"} · ${formatMinutes(item.duracion_min || 0)}`)
+        .join("\n");
+    }
+
+    function parseLineSummaryDowntime(rows) {
+      const parsed = [];
+      rows.forEach(row => {
+        const startTime = String(row["StartTime"] || row["starttime"] || "").trim();
+        const endTime = String(row["ENDTime"] || row["EndTime"] || row["endtime"] || "").trim();
+        const duration = parseFloat(String(row["Duration"] || row["duration"] || "0").replace(",", "."));
+        const fault = String(row["Fault"] || row["fault"] || "").trim();
+        const reason1 = String(row["Reason1"] || row["reason1"] || "").trim();
+        const reason2 = String(row["Reason2"] || row["reason2"] || "").trim();
+        const reason3 = String(row["Reason3"] || row["reason3"] || "").trim();
+        const reason4 = String(row["Reason4"] || row["reason4"] || "").trim();
+        const location = String(row["Location"] || row["location"] || "").trim();
+        const shift = String(row["Shift"] || row["shift"] || "").trim();
+        const comments = String(row["Comments"] || row["comments"] || "").trim();
+        const status = String(row["Status"] || row["status"] || "").trim();
+        if (!startTime || (!fault && duration === 0)) return;
+        if (duration === 0 && status === "0") return;
+        parsed.push({
+          id: Date.now() + Math.random(),
+          start_time: startTime,
+          end_time: endTime,
+          duracion_min: Math.round(duration || 0),
+          fault,
+          reason1,
+          reason2,
+          reason3,
+          reason4,
+          area: mapArea(location),
+          location_raw: location,
+          shift,
+          comentario: comments,
+          origen: "proficy_linesummary"
+        });
+      });
+      return parsed;
+    }
+
+    function parseDprSummary(rows, filename) {
+      const get = label => {
+        for (const row of rows) {
+          const cells = row.map(value => String(value || "").trim());
+          const idx = cells.findIndex(cell => cell.toLowerCase().includes(label.toLowerCase()));
+          if (idx >= 0) {
+            return cells.slice(idx + 1).filter(Boolean);
+          }
+        }
+        return [];
+      };
+
+      let fecha = "";
+      const startRow = rows.find(row => row.some(cell => String(cell || "").includes("Start Date")));
+      if (startRow) {
+        const idx = startRow.findIndex(cell => String(cell || "").includes("Start Date"));
+        if (idx >= 0) fecha = String(startRow[idx + 1] || "").slice(0, 10);
+      }
+      if (!fecha) {
+        const match = filename.match(/(\d{4})(\d{2})(\d{2})/);
+        fecha = match ? `${match[1]}-${match[2]}-${match[3]}` : new Date().toISOString().slice(0, 10);
+      }
+
+      const lineStops = get("Line Stops");
+      const downtime = get("Downtime");
+      const goodProduct = get("Good Product");
+      const producto = (get("Product Code")[0] || get("Product")[0] || "").replace("All", "").trim();
+
+      return {
+        id: Date.now() + Math.random(),
+        fecha,
+        producto,
+        paros_t1: parseInt(lineStops[0] || 0, 10) || 0,
+        paros_t2: parseInt(lineStops[1] || 0, 10) || 0,
+        paros_t3: parseInt(lineStops[2] || 0, 10) || 0,
+        paros_total: parseInt(lineStops[3] || lineStops[2] || 0, 10) || 0,
+        downtime_t1: parseFloat(String(downtime[0] || "0").replace(",", ".")) || 0,
+        downtime_t2: parseFloat(String(downtime[1] || "0").replace(",", ".")) || 0,
+        downtime_t3: parseFloat(String(downtime[2] || "0").replace(",", ".")) || 0,
+        downtime_total: parseFloat(String(downtime[3] || downtime[2] || "0").replace(",", ".")) || 0,
+        good_product_total: parseInt(goodProduct[3] || goodProduct[2] || 0, 10) || 0,
+        origen: "proficy_dpr"
+      };
+    }
+
+    async function readExcelProficy(file) {
+      if (!window.XLSX) {
+        throw new Error("No se ha podido cargar la libreria XLSX.");
+      }
+      const buffer = await file.arrayBuffer();
+      const workbook = XLSX.read(buffer, { type: "array", cellDates: true });
+
+      if (workbook.SheetNames.includes("Downtime")) {
+        const rows = XLSX.utils.sheet_to_json(workbook.Sheets["Downtime"], { defval: "", raw: false });
+        return { type: "paros", data: parseLineSummaryDowntime(rows) };
+      }
+      if (workbook.SheetNames.includes("Summary")) {
+        const rows = XLSX.utils.sheet_to_json(workbook.Sheets["Summary"], { defval: "", raw: false, header: 1 });
+        const parsed = parseDprSummary(rows, file.name);
+        return { type: "dpr", data: parsed ? [parsed] : [] };
+      }
+      const firstSheet = workbook.SheetNames[0];
+      const rows = XLSX.utils.sheet_to_json(workbook.Sheets[firstSheet], { defval: "", raw: false });
+      return { type: "otros", data: rows };
+    }
+
+    async function readCsvProficy(file) {
+      const text = await file.text();
+      const delim = text.split("\n")[0].split(";").length > text.split("\n")[0].split(",").length ? ";" : ",";
+      const lines = text.split(/\r?\n/).map(line => line.trim()).filter(Boolean);
+      if (lines.length < 2) return { type: "otros", data: [] };
+      const headers = lines[0].split(delim).map(item => item.replace(/"/g, "").trim());
+      const rows = lines.slice(1).map(line => {
+        const cols = line.split(delim);
+        const row = {};
+        headers.forEach((header, index) => {
+          row[header] = (cols[index] || "").replace(/"/g, "").trim();
+        });
+        return row;
+      });
+      const headerText = headers.join(" ").toLowerCase();
+      if (/starttime|fault|reason1|duration|downtime/.test(headerText)) {
+        return { type: "paros", data: parseLineSummaryDowntime(rows) };
+      }
+      return { type: "otros", data: rows };
+    }
+
+    function activateZone(zone) {
+      currentZone = zone || "";
+      localStorage.setItem(STORAGE_KEYS.zone, currentZone);
+      document.querySelectorAll(".zone-chip").forEach(button => {
+        button.classList.toggle("active", (button.dataset.zone || "") === currentZone);
+      });
+    }
+
+    function renderConsultaResult(data) {
+      const result = document.getElementById("consultaResult");
+      const sources = Array.isArray(data.fuentes) ? data.fuentes : [];
+      const patterns = Array.isArray(data.patrones) ? data.patrones : [];
+      const sourceHtml = sources.length
+        ? `
+          <div class="meta-block">
+            <h3>Fuentes usadas</h3>
+            <div class="meta-chips">
+              ${sources.map(item => `<span class="meta-chip">${escapeHtml(item.tipo)}: ${escapeHtml(item.cantidad)}${item.detalle ? ` · ${escapeHtml(item.detalle)}` : ""}</span>`).join("")}
+            </div>
+          </div>
+        `
+        : "";
+      const patternHtml = patterns.length
+        ? `
+          <div class="meta-block">
+            <h3>Patrones detectados</h3>
+            <div class="list">
+              ${patterns.map(item => `<div class="list-item">${escapeHtml(item)}</div>`).join("")}
+            </div>
+          </div>
+        `
+        : "";
+      const providerLabel = data.provider ? `Proveedor: ${data.provider}` : "Proveedor: local";
+      const zoneLabel = `Zona activa: ${getZoneLabel(data.zona_activa || currentZone)}`;
+
+      result.innerHTML = `
+        <div class="meta-chips">
+          <span class="meta-chip">${escapeHtml(providerLabel)}</span>
+          <span class="meta-chip">${escapeHtml(zoneLabel)}</span>
+        </div>
+        <div class="meta-block">
+          <h3>Respuesta</h3>
+          <div class="result-body"><p>${nl2br(data.respuesta || "Sin respuesta.")}</p></div>
+        </div>
+        ${sourceHtml}
+        ${patternHtml}
+      `;
+    }
+
+    async function loadStats() {
+      const data = await requestJson("/stats");
+      document.getElementById("sParos").textContent = data.paros_dds ?? "-";
+      document.getElementById("sRdis").textContent = data.rdis ?? "-";
+      document.getElementById("sPm").textContent = data.pm_cards ?? "-";
+      document.getElementById("sMie").textContent = data.mie_range ?? "-";
+    }
+
+    async function loadAlertas() {
+      const data = await requestJson("/alertas?limit=8");
+      const container = document.getElementById("alertasResult");
+      renderList(
+        container,
+        data,
+        item => `
+          <div class="list-item">
+            <strong>${escapeHtml(item.componente || "Sin componente")}</strong>
+            <div>Paros registrados: ${escapeHtml(item.total_paros)}</div>
+            <div>Tiempo total parado: ${escapeHtml(item.tiempo_total_min)} min</div>
+          </div>
+        `,
+        "Todavia no hay alertas repetitivas para mostrar."
+      );
+    }
+
+    document.getElementById("usarEjemploBtn").addEventListener("click", () => {
+      document.getElementById("consulta").value = "Me falla la optima y no coge bien la bolsa. Ha pasado antes? Que revisar primero y que parametro MID-RANGE debo mirar?";
+    });
+
+    document.getElementById("consultarBtn").addEventListener("click", async () => {
+      const button = document.getElementById("consultarBtn");
+      const consulta = document.getElementById("consulta").value.trim();
+      const result = document.getElementById("consultaResult");
+      const useProficy = document.getElementById("consultaUseProficy").checked;
+      if (!consulta) {
+        result.textContent = "Escribe una consulta antes de lanzar la peticion.";
+        return;
+      }
+      if (useProficy && !hasProficyData()) {
+        result.textContent = "Has marcado el contexto Proficy, pero todavia no hay ningun informe cargado.";
+        return;
+      }
+      setBusy(button, true, "Consultando...");
+      try {
+        const data = await requestJson("/consulta", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            consulta,
+            top_k: 8,
+            usar_llm: true,
+            provider: document.getElementById("provider").value,
+            zona: currentZone || null,
+            contexto_extra: useProficy ? (buildProficyContext() || null) : null
+          })
+        });
+        renderConsultaResult(data);
+      } catch (error) {
+        result.textContent = "No se pudo completar la consulta.\n\n" + error.message;
+      } finally {
+        setBusy(button, false);
+      }
+    });
+
+    document.getElementById("paramBtn").addEventListener("click", async () => {
+      const button = document.getElementById("paramBtn");
+      const query = document.getElementById("paramQuery").value.trim();
+      const result = document.getElementById("paramResult");
+      setBusy(button, true, "Buscando...");
+      try {
+        let rows;
+        if (/^\d{2,4}-\d{3}$/.test(query)) {
+          rows = await requestJson(`/mie_range?codigo=${encodeURIComponent(query)}&limit=20`);
+        } else {
+          rows = await requestJson(`/mie_busqueda?q=${encodeURIComponent(query)}&limit=20`);
+        }
+        const cambios = query ? await requestJson(`/mie_cambios?codigo=${encodeURIComponent(query)}&limit=10`) : [];
+        const items = rows.slice(0, 10).map(row => ({
+          title: [row.codigo_variable, row.descripcion, row.formato].filter(Boolean).join(" / "),
+          lines: [
+            row.estacion ? `Estacion: ${row.estacion}` : "",
+            row.valor_target ? `Target: ${row.valor_target}` : "",
+            row.tolerancia_inf || row.tolerancia_sup ? `Tolerancias: ${row.tolerancia_inf || "-"} / ${row.tolerancia_sup || "-"}` : "",
+            row.tipo ? `Tipo: ${row.tipo}` : ""
+          ].filter(Boolean)
+        }));
+        if (cambios.length) {
+          items.unshift({
+            title: "Ultimo cambio encontrado",
+            lines: [
+              [cambios[0].fecha, cambios[0].codigo_variable, cambios[0].descripcion_variable].filter(Boolean).join(" / "),
+              cambios[0].valor_actual ? `Valor actual: ${cambios[0].valor_actual}` : ""
+            ].filter(Boolean)
+          });
+        }
+        renderList(
+          result,
+          items,
+          item => `
+            <div class="list-item">
+              <strong>${escapeHtml(item.title)}</strong>
+              ${item.lines.map(line => `<div>${escapeHtml(line)}</div>`).join("")}
+            </div>
+          `,
+          "No se encontraron parametros con esa busqueda."
+        );
+      } catch (error) {
+        result.innerHTML = `<div class="list-item">No se pudo consultar MID-RANGE.<br><br>${escapeHtml(error.message)}</div>`;
+      } finally {
+        setBusy(button, false);
+      }
+    });
+
+    document.getElementById("docBtn").addEventListener("click", async () => {
+      const button = document.getElementById("docBtn");
+      const query = document.getElementById("docQuery").value.trim();
+      const result = document.getElementById("docResult");
+      setBusy(button, true, "Buscando...");
+      try {
+        const data = await requestJson(`/biblioteca?q=${encodeURIComponent(query)}&limit=30`);
+        renderList(
+          result,
+          data,
+          item => `
+            <div class="list-item">
+              <strong>${escapeHtml(item.nombre)}</strong>
+              <div>Categoria: ${escapeHtml(item.categoria)}</div>
+              <div>Ruta: ${escapeHtml(item.ruta)}</div>
+            </div>
+          `,
+          "No hay documentos que coincidan con la busqueda."
+        );
+      } catch (error) {
+        result.innerHTML = `<div class="list-item">No se pudo consultar la biblioteca.<br><br>${escapeHtml(error.message)}</div>`;
+      } finally {
+        setBusy(button, false);
+      }
+    });
+
+    document.getElementById("kmBtn").addEventListener("click", async () => {
+      const button = document.getElementById("kmBtn");
+      const result = document.getElementById("kmResult");
+      const payload = {
+        area: document.getElementById("kmArea").value.trim() || null,
+        estacion: document.getElementById("kmEstacion").value.trim() || null,
+        componente: document.getElementById("kmComponente").value.trim() || null,
+        titulo: document.getElementById("kmTitulo").value.trim(),
+        descripcion: document.getElementById("kmDescripcion").value.trim(),
+        solucion: document.getElementById("kmSolucion").value.trim() || null,
+        causa_raiz: document.getElementById("kmCausa").value.trim() || null,
+        tags: document.getElementById("kmTags").value.trim() || null,
+        tipo: "foco_manual",
+        fuente: "usuario"
+      };
+      if (!payload.titulo || !payload.descripcion) {
+        result.textContent = "Para guardar conocimiento manual, rellena al menos titulo y descripcion.";
+        return;
+      }
+      setBusy(button, true, "Guardando...");
+      try {
+        await requestJson("/conocimiento", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        result.textContent = "Conocimiento guardado correctamente. A partir de ahora podra entrar en futuras consultas.";
+        document.getElementById("kmArea").value = "";
+        document.getElementById("kmEstacion").value = "";
+        document.getElementById("kmComponente").value = "";
+        document.getElementById("kmTitulo").value = "";
+        document.getElementById("kmDescripcion").value = "";
+        document.getElementById("kmSolucion").value = "";
+        document.getElementById("kmCausa").value = "";
+        document.getElementById("kmTags").value = "";
+        await loadStats();
+      } catch (error) {
+        result.textContent = "No se pudo guardar el conocimiento.\n\n" + error.message;
+      } finally {
+        setBusy(button, false);
+      }
+    });
+
+    document.getElementById("ingestBtn").addEventListener("click", async () => {
+      const button = document.getElementById("ingestBtn");
+      const result = document.getElementById("ingestResult");
+      setBusy(button, true, "Procesando...");
+      try {
+        const data = await requestJson("/ingest/carpeta", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ force: false })
+        });
+        result.textContent =
+          `Archivos procesados: ${data.procesados}\n` +
+          `Archivos omitidos: ${data.omitidos}\n` +
+          `Registros insertados: ${data.registros}`;
+        await loadStats();
+      } catch (error) {
+        result.textContent = "La ingesta ha fallado.\n\n" + error.message;
+      } finally {
+        setBusy(button, false);
+      }
+    });
+
+    document.getElementById("uploadBtn").addEventListener("click", async () => {
+      const button = document.getElementById("uploadBtn");
+      const result = document.getElementById("uploadResult");
+      const tipo = document.getElementById("tipo").value;
+      const file = document.getElementById("archivo").files[0];
+      if (!file) {
+        result.textContent = "Selecciona un archivo antes de subirlo.";
+        return;
+      }
+      const formData = new FormData();
+      formData.append("tipo", tipo);
+      formData.append("archivo", file);
+      setBusy(button, true, "Subiendo...");
+      try {
+        const data = await requestJson("/ingest/upload", {
+          method: "POST",
+          body: formData
+        });
+        result.textContent =
+          `Archivo: ${data.nombre_original || data.archivo}\n` +
+          `Tipo: ${data.tipo}\n` +
+          `Estado: ${data.estado}\n` +
+          `Registros: ${data.registros}`;
+        await loadStats();
+      } catch (error) {
+        result.textContent = "No se pudo procesar el archivo.\n\n" + error.message;
+      } finally {
+        setBusy(button, false);
+      }
+    });
+
+    document.getElementById("statsBtn").addEventListener("click", async () => {
+      try {
+        await loadStats();
+        await loadAlertas();
+      } catch (_) {
+      }
+    });
+
+    document.getElementById("alertasBtn").addEventListener("click", async () => {
+      const button = document.getElementById("alertasBtn");
+      setBusy(button, true, "Cargando...");
+      try {
+        await loadAlertas();
+      } finally {
+        setBusy(button, false);
+      }
+    });
+
+    document.getElementById("kmExportBtn").addEventListener("click", async () => {
+      const button = document.getElementById("kmExportBtn");
+      const result = document.getElementById("kmResult");
+      setBusy(button, true, "Exportando...");
+      try {
+        const data = await requestJson("/conocimiento?limit=5000");
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const anchor = document.createElement("a");
+        anchor.href = url;
+        anchor.download = `mcm5_conocimiento_${new Date().toISOString().slice(0, 10)}.json`;
+        anchor.click();
+        URL.revokeObjectURL(url);
+        result.textContent = `Exportados ${data.length} registros de conocimiento manual.`;
+      } catch (error) {
+        result.textContent = "No se pudo exportar el conocimiento.\n\n" + error.message;
+      } finally {
+        setBusy(button, false);
+      }
+    });
+
+    document.getElementById("kmImportBtn").addEventListener("click", async () => {
+      const input = document.createElement("input");
+      input.type = "file";
+      input.accept = ".json";
+      input.onchange = async event => {
+        const file = event.target.files?.[0];
+        const result = document.getElementById("kmResult");
+        if (!file) {
+          return;
+        }
+        try {
+          const raw = await file.text();
+          const parsed = JSON.parse(raw);
+          if (!Array.isArray(parsed)) {
+            throw new Error("El archivo no contiene una lista de conocimiento.");
+          }
+          const payload = {
+            items: parsed.map(item => ({
+              area: item.area || null,
+              estacion: item.estacion || null,
+              componente: item.componente || null,
+              tipo: item.tipo || "foco_manual",
+              titulo: item.titulo,
+              descripcion: item.descripcion,
+              solucion: item.solucion || null,
+              causa_raiz: item.causa_raiz || null,
+              tags: item.tags || null,
+              fuente: item.fuente || "importado"
+            }))
+          };
+          const response = await requestJson("/conocimiento/import", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+          });
+          result.textContent = `Importacion completada. Insertados: ${response.insertados}. Omitidos por duplicado: ${response.omitidos}.`;
+          await loadStats();
+        } catch (error) {
+          result.textContent = "No se pudo importar el conocimiento.\n\n" + error.message;
+        }
+      };
+      input.click();
+    });
+
+    document.getElementById("proficyImportBtn").addEventListener("click", async () => {
+      const button = document.getElementById("proficyImportBtn");
+      const input = document.getElementById("proficyFile");
+      const file = input.files[0];
+      if (!file) {
+        renderProficySummary("Selecciona antes un archivo Proficy.");
+        return;
+      }
+      setBusy(button, true, "Importando...");
+      try {
+        const formData = new FormData();
+        formData.append("archivo", file);
+        const parsed = await requestJson("/proficy/upload", {
+          method: "POST",
+          body: formData
+        });
+        if (!parsed.data.length) {
+          renderProficySummary("No he encontrado datos aprovechables en ese archivo Proficy.");
+          return;
+        }
+        const added = mergeProficyData(parsed.type, parsed.data);
+        renderProficySummary(
+          `Importacion Proficy completada. Tipo: ${parsed.type}. Registros nuevos: ${added}. Total acumulado: ${(proficyStore[parsed.type] || []).length}.`
+        );
+        input.value = "";
+      } catch (error) {
+        renderProficySummary("No se pudo importar el informe Proficy.\n\n" + error.message);
+      } finally {
+        setBusy(button, false);
+      }
+    });
+
+    document.getElementById("proficyExportBtn").addEventListener("click", () => {
+      const blob = new Blob([JSON.stringify(proficyStore, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = `mcm5_proficy_${new Date().toISOString().slice(0, 10)}.json`;
+      anchor.click();
+      URL.revokeObjectURL(url);
+      renderProficySummary("Backup Proficy exportado correctamente.");
+    });
+
+    document.getElementById("proficyClearBtn").addEventListener("click", () => {
+      proficyStore = { paros: [], descartes: [], dpr: [], otros: [] };
+      saveProficyStore();
+      renderProficySummary("Datos Proficy eliminados de esta app.");
+    });
+
+    document.getElementById("proficyMayorBtn").addEventListener("click", () => {
+      renderProficySummary(calcProficyMayorPerdida());
+    });
+
+    document.getElementById("proficyTurnoBtn").addEventListener("click", () => {
+      renderProficySummary(calcProficyPorTurno());
+    });
+
+    document.getElementById("proficySinComBtn").addEventListener("click", () => {
+      renderProficySummary(calcProficySinComentario());
+    });
+
+    document.querySelectorAll(".zone-chip").forEach(button => {
+      button.addEventListener("click", () => activateZone(button.dataset.zone || ""));
+    });
+
+    document.querySelectorAll(".shortcut-btn").forEach(button => {
+      button.addEventListener("click", () => {
+        document.getElementById("consulta").value = button.dataset.question || "";
+        document.getElementById("consulta").focus();
+      });
+    });
+
+    const providerSelect = document.getElementById("provider");
+    const storedProvider = localStorage.getItem(STORAGE_KEYS.provider);
+    if (storedProvider) {
+      providerSelect.value = storedProvider;
+    }
+    providerSelect.addEventListener("change", () => {
+      localStorage.setItem(STORAGE_KEYS.provider, providerSelect.value);
+    });
+
+    activateZone(localStorage.getItem(STORAGE_KEYS.zone) || "");
+    renderProficySummary();
+
+    loadStats().catch(() => {});
+    loadAlertas().catch(() => {});
+  </script>
+</body>
+</html>
